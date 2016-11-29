@@ -271,21 +271,25 @@
                                 <div class="col-md-3 objField" title="String - 20 Bytes - Address">address:</div>
                                 <div class="col-md-9">{{obj.address}}</div>
                             </div>
-
                             <div class="row">
                                 <div class="col-md-3 objField" title="BigNumber - balance">balance:</div>
                                 <div class="col-md-9">{{obj.balance  | units : settings.unit}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Is contract ?">is contract ?</div>
+                                <div class="col-md-9" ng-show="obj.code == '0x'">No</div>
+                                <div class="col-md-9" ng-show="obj.code != '0x'">Yes</div>
                             </div>
                             <div class="row">
                                 <div class="col-md-3 objField" title="BigNumber - numbers of transactions sent from this address">txCount:</div>
                                 <div class="col-md-9">{{obj.txCount}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 objField" title="String - Get the storage at a specific position of an address. Show only position 0">storageAt:</div>
+                                <div class="col-md-3 objField" title="String - storage at a specific position of an address. Show only position 0">storageAt:</div>
                                 <div class="col-md-9 bigText">{{obj.storageAt}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 objField" title="String - Get the code at a specific address.">code:</div>
+                                <div class="col-md-3 objField" title="String - the code at a specific address.">code:</div>
                                 <div class="col-md-9 bigText">{{obj.code}}</div>
                             </div>
                       </div>
