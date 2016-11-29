@@ -9,3 +9,4 @@ Benefits:
 </ul>
 
 Actis is Ethereum Dapp application that based on Web3.js.
+<img src="actis.png" width="350"/>
