@@ -21,7 +21,7 @@
     <link rel="stylesheet" href="actis.css"/>
     <script type="text/javascript" src="actis.js"></script>
   </head>
-  
+
   <body ng-controller="mainController" style="color:#3C3C3C;font-size:13px">
     <!--
       Top panel
@@ -74,7 +74,7 @@
 
    <div style="margin-top:5px;margin-left:10px" ng-hide="settings.web3==null">
        <div class="list-group list-group-horizontal">
-         <div class="list-group-item" style="width:180px">
+         <div class="list-group-item">
            <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab('pending')" style="cursor: pointer;">pending</a></h4>
            <p class="list-group-item-text">tx: {{$root.ui.pendingBlock.transactions.length}}</p>
          </div>
