@@ -1,0 +1,337 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" ng-app="ActisApp">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <title>Actis</title>
+
+    <script type="text/javascript" src="lib/jquery.js"></script>
+    <!-- angular -->
+    <script type="text/javascript" src="lib/angular/angular.min.js"></script>
+    <script type="text/javascript" src="lib/angular/angular-resource.min.js"></script>
+    <script type="text/javascript" src="lib/angular/angular-cookies.min.js"></script>
+    <script type="text/javascript" src="lib/angular/angular-sanitize.min.js"></script>
+    <!-- bootstrap -->
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css?3.1.1"/>
+  	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css?3.1.1"/>
+  	<script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js?3.1.1"></script>
+    <!-- eth web3.js API connector -->
+    <script type="text/javascript" src="lib/web3.min.js"></script>
+    <!-- actis -->
+    <link rel="stylesheet" href="actis.css"/>
+    <script type="text/javascript" src="actis.js"></script>
+
+  </head>
+  <body ng-controller="mainController" style="color:#3C3C3C;font-size:13px">
+    <!--
+      Top panel
+    -->
+    <nav class="navbar navbar-default navbar-fixed-top">
+     <div class="container-fluid">
+       <div class="navbar-header">
+         <a class="navbar-brand" href="#" style="color:#ED723D;font-size:26px">ACTIS</a>
+       </div>
+
+       <div id="navbar" class="navbar-collapse collapse">
+         <ul class="nav  navbar-nav topPanel">
+           <li style="margin-left:40px;width:200px">
+              <div>Peer address</div>
+              <div>{{settings.peerUri}}</div>
+           </li>
+            <li>
+              <div>Netw. prot. ver.</div>
+              <div>{{ui.networkProtocolVer}}</div>
+            </li>
+            <li>
+               <div>ETH prot. ver.</div>
+               <div>{{ui.ethProtocolVer}}</div>
+          </li>
+          <li>
+            <div>Is mining</div>
+            <div  ng-style="{'color': ui.mining ? '#D9534F':''}">{{ui.mining}}</div>
+          </li>
+           <li ng-show="ui.mining">
+             <div>Peer hash rate(H/s)</div>
+             <div>{{ui.hashRate}}</div>
+           </li>
+           <li>
+             <div>Gas price</div>
+             <div>{{ui.gasPrice  | units : settings.unit}}</div>
+           </li>
+           <li>
+             <div>ETH units</div>
+             <select class="form-control controlSelect" ng-model="$root.settings.unit"  ng-options="unit as unit for unit in settings.units" ng-change="changeETHUnit()"></select>
+           </li>
+
+
+         </ul>
+         <ul class="nav navbar-nav navbar-right" style="margin-top:10px;margin-right:1px">
+           <li><span class="glyphicon glyphicon-cog" style="font-size:28px;cursor:pointer" aria-hidden="true" data-toggle="modal" data-target="#settingsModal"></span></li>
+         </ul>
+       </div>
+     </div>
+   </nav>
+
+   <div style="margin-top:5px;margin-left:10px" ng-hide="settings.web3==null">
+       <div class="list-group list-group-horizontal">
+         <div class="list-group-item" style="width:180px">
+           <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab('pending')" style="cursor: pointer;">pending</a></h4>
+           <p class="list-group-item-text">tx: {{$root.ui.pendingBlock.transactions.length}}</p>
+         </div>
+        <div class="list-group-item" ng-repeat="block in ui.blockArr" style="width:190px">
+          <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab(block.number)" style="cursor: pointer;">{{block.number}}</a></h4>
+          <p class="list-group-item-text">time: {{block.timestamp | utc | date:'HH:mm:ss'}} tx: <span ng-class="{objField : block.transactions.length > 0}">{{block.transactions.length}}</span></p>
+        </div>
+      </div>
+
+      <div class="container-fluid" ng-hide="settings.web3==null">
+            <div class="row" >
+                <div class="col-md-4" style="padding-right:0px">
+                    <input type="text"  class="form-control" placeholder="Block, transaction, address | Press Enter to search"  maxlength="100"  ng-model="searchString"  ng-keyup="$event.keyCode == 13 && searchComponent()"/>
+                </div>
+                <div class="col-md-8" style="padding-left:0px">
+                    <img src="img/loader.gif"  style="height:36px" ng-style="{'visibility': ui.showProgress ? 'visible':'hidden'}" /> Last search: {{infoSearch}}
+                </div>
+            </div>
+            <!-- Nav tabs -->
+            <ul id="tab-list" class="nav nav-tabs" role="tablist" style="margin-top:5px">
+                <li ng-repeat="(tabName, tabValue) in userTabs" ng-class="{'active' :  tabSelected==tabName}" style="cursor:pointer">
+                  <a style="padding:6px 10px" ng-click="selectTab(tabName)">{{tabName.substring(0,15)}} <span class="glyphicon glyphicon-remove" aria-hidden="true"  ng-click="closeTab(tabName)"></span></a>
+                </li>
+            </ul>
+            <!--
+              Tab panes
+            -->
+            <div class="tab-content">
+                <div  ng-repeat="(tabName, obj) in userTabs"  ng-show="tabSelected == tabName">
+
+                      <div ng-show="tabName.startsWith('block')">
+                        <div class="row">
+                          <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-3 objField" title="The block number,  null when its pending block">number:</div><div class="col-md-9">{{obj.number}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - the unix timestamp for when the block was collated.">timestamp:</div><div class="col-md-9">{{obj.timestamp  | utc | date:'dd.MM.yyyy HH:mm:ss'}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="BigNumber - integer of the difficulty for this block.">difficulty:</div><div class="col-md-9">{{obj.difficulty.toNumber()}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="BigNumber - integer of the total difficulty of the chain until this block.">totalDifficulty:</div><div class="col-md-9">{{obj.totalDifficulty.toNumber()}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - the maximum gas allowed in this block.">gasLimit:</div><div class="col-md-9">{{obj.gasLimit}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - the total used gas by all transactions in this block.">gasUsed:</div><div class="col-md-9">{{obj.gasUsed}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - integer the size of this block in bytes.">size:</div><div class="col-md-9">{{obj.size}}</div>
+                            </div>
+                          </div>
+
+                          <div class="col-md-5">
+                              <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - hash of the block. null when its pending block.">hash:</div><div class="col-md-10">{{obj.hash}}</div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - hash of the parent block.">parentHash:</div><div class="col-md-10"><a ng-click="openBlockTab(obj.parentHash)"  class="specA">{{obj.parentHash}}</a></div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-2 objField" title="String, 20 Bytes - the address of the beneficiary to whom the mining rewards were given.">miner:</div>
+                                <div class="col-md-10"><a class="specA" ng-click="openAddressTab(obj.miner)">{{obj.miner}}</a></div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - the root of the transaction trie of the block.">transactionsRoot:</div><div class="col-md-9">{{obj.transactionsRoot}}</div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - the root of the final state trie of the block.">stateRoot:</div><div class="col-md-10">{{obj.stateRoot}}</div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - SHA3 of the uncles data in the block.">sha3Uncles:</div><div class="col-md-10">{{obj.sha3Uncles}}</div>
+                              </div>
+                              <div class="row">
+                                <div class="col-md-2 objField" title="String - the 'extra data' field of this block.">extraData:</div><div class="col-md-10">{{obj.extraData}}</div>
+                              </div>
+                            </div>
+
+                            <div class="col-md-4">
+                                <span class="objField" title="Array of uncle hashes">uncles:</span> <div class="bigText" style="height:50px;overflow-y:scroll">{{obj.uncles}}</div>
+                                <span class="objField" title="256 Bytes - the bloom filter for the logs of the block. null when its pending block.">logsBloom:</span> <div class="bigText" style="height:50px;overflow-y:scroll">{{obj.logsBloom}}</div>
+                            </div>
+                        </div>
+                        <table class="table">
+                              <thead>
+                                  <tr>
+                                      <th>N</th><th>Hash</th><th>From</th><th>Nonce</th><th>To</th><th>Value</th><th>Gas price</th><th title="Number - gas provided by the sender.">Gas</th><th>Input</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr ng-repeat="tx in obj.transactions">
+                                      <td>{{tx.transactionIndex}}</td>
+                                      <td><a ng-click="openTxTab(tx.hash)" class="specA">{{tx.hash}}</a></td>
+                                      <td>
+                                        <a ng-click="openAddressTab(tx.from)" class="specA">{{tx.from}}</a>
+                                      </td>
+                                      <td>{{tx.nonce}}</td>
+                                      <td>
+                                        <span class="label label-success" ng-show="	tx.toContr=='M'" title="Contract mined !">M</span>
+                                        <span class="label label-danger" ng-show="tx.toContr=='E'" title="Contract not created">E</span>
+                                        <span class="label label-primary" ng-show="tx.toContr=='C'" title="Contract">C</span>
+                                        <a ng-click="openAddressTab(tx.to)" class="specA">{{tx.to}}</a>
+                                      </td>
+                                      <td>{{tx.value | units : settings.unit}}</td>
+                                      <td>{{tx.gasPrice | units : settings.unit}}</td>
+                                      <td>{{tx.gas}}</td>
+                                      <td>{{tx.input.substring(0,10)}}</td>
+                                  </tr>
+                              </tbody>
+                            </table>
+                      </div>
+
+                        <div ng-show="tabName.startsWith('tx')">
+                          <div class="row">
+                            <div class="col-md-5">
+                          <div class="row">
+                              <div class="col-md-3 objField" title="String, 32 Bytes - hash of the transaction.">hash:</div>
+                              <div class="col-md-9">{{obj.hash}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="Number - block number where this transaction was in. null when its pending.">blockNumber:</div>
+                              <div class="col-md-9"><a ng-click="openBlockTab(obj.blockNumber)" class="specA">{{obj.blockNumber}}</a> ({{ui.blockArr[0].number - obj.blockNumber}} block confirmations)</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="String, 32 Bytes - hash of the block where this transaction was in. null when its pending.">blockHash:</div>
+                              <div class="col-md-9">{{obj.blockHash}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="Number - integer of the transactions index position in the block. null when its pending.">transactionIndex:</div>
+                              <div class="col-md-9">{{obj.transactionIndex}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="String, 20 Bytes - address of the sender.">from:</div>
+                              <div class="col-md-9"><a ng-click="openAddressTab(obj.from)" class="specA">{{obj.from}}</a></div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="Number - the number of transactions made by the sender prior to this one.">nonce:</div>
+                              <div class="col-md-9">{{obj.nonce}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="String, 20 Bytes - address of the receiver. null when its a contract creation transaction.">to:</div>
+                              <div class="col-md-9"><a ng-click="openAddressTab(obj.to)" class="specA">{{obj.to}}</a></div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="BigNumber - value.">value:</div>
+                              <div class="col-md-9">{{obj.value  | units : settings.unit}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="Transaction network fee (gas * gasPrice)">fee:</div>
+                              <div class="col-md-9">{{obj.gas * obj.gasPrice | unitsSimpleNumber : settings.unit}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="String - 20 Bytes - The contract address created, if the transaction was a contract creation, otherwise null.">contractAddress:</div>
+                              <div class="col-md-9 objField2"><a class="specA2" ng-click="openAddressTab(obj.contractAddress)">{{obj.contractAddress}}</a></div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="BigNumber - gas price provided by the sender in Wei.">gasPrice:</div>
+                              <div class="col-md-9">{{obj.gasPrice  | units : settings.unit}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="Number - gas provided by the sender">gas:</div>
+                              <div class="col-md-9">{{obj.gas}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="The amount of gas used by this specific transaction alone.">gasUsed:</div><div class="col-md-9">{{obj.gasUsed}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="Number - The total amount of gas used when this transaction was executed in the block.">cumulativeGasUsed:</div><div class="col-md-9">{{obj.cumulativeGasUsed}}</div>
+                          </div>
+                          <div class="row">
+                              <div class="col-md-3 objField" title="Array of log objects, which this transaction generated.">logs:</div>
+                              <div class="col-md-9 bigText">
+                                {{obj.logs}}
+                              </div>
+                          </div>
+                        </div>
+
+                        <div class="col-md-7">
+                          <div class="row">
+                            <span class="objField">input:</span> <span class="bigText" title="String - the data sent along with the transaction.">{{obj.input}}</span>
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+
+                    <div ng-show="tabName.startsWith('addr')">
+                      <div class="row">
+                        <div class="col-md-5">
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String - 20 Bytes - Address">address:</div>
+                                <div class="col-md-9">{{obj.address}}</div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-3 objField" title="BigNumber - balance">balance:</div>
+                                <div class="col-md-9">{{obj.balance  | units : settings.unit}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="BigNumber - numbers of transactions sent from this address">txCount:</div>
+                                <div class="col-md-9">{{obj.txCount}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String - Get the storage at a specific position of an address. Show only position 0">storageAt:</div>
+                                <div class="col-md-9 bigText">{{obj.storageAt}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String - Get the code at a specific address.">code:</div>
+                                <div class="col-md-9 bigText">{{obj.code}}</div>
+                            </div>
+                      </div>
+                    </div>
+                </div>
+
+
+          </div>
+        </div>
+
+
+      </div>
+    </div>
+    <!--
+      Settings modal
+    -->
+    <div id="settingsModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form name="chageActisSettingsForm" ng-submit="applySettings(chageActisSettingsForm)" novalidate>
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal">&times;</button>
+              <h4 class="modal-title">Actis configuration</h4>
+            </div>
+            <div class="modal-body">
+              <div class="err">{{settingsErr}}</div>
+              <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerUri.$invalid && !chageActisSettingsForm.peerUri.$pristine}">
+                  <label>RPC node address</label>
+                  <input type="text" ng-maxlength="50" ng-minlength="8" class="form-control" placeholder="Enter peer address. Example: http://127.0.0.1:8545" name="peerUri" ng-model="$root.settings.peerUri"  required>
+                  <p ng-show="chageActisSettingsForm.peerUri.$error.minlength" class="help-block">Peer address is too short.</p>
+              </div>
+              <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.blockCount.$invalid && !chageActisSettingsForm.blockCount.$pristine}">
+                  <label>Show blocks count</label>
+                  <input type="text" onkeypress="return isNumberKey(event, this)" ng-maxlength="2" ng-minlength="1" class="form-control" placeholder="Block count" name="blockCount" ng-model="$root.settings.blockCount"  required>
+                  <p ng-show="chageActisSettingsForm.blockCount.$error.minlength" class="help-block">Invalid block count</p>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-info" ng-disabled="chageActisSettingsForm.$invalid">Apply</button>
+              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
+  </body>
+</html>
