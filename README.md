@@ -1,5 +1,5 @@
 # Actis
-Ethereum private blockchain monitoring tool <br/>
+Ethereum private blockchain monitoring tool.<br/>
 Benefits:
 <ul>
   <li>No installation needed (only modern browser you should have), no any dependencies.</li>
