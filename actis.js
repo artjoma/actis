@@ -42,7 +42,7 @@ app.run(function ($rootScope, uiService) {
   $rootScope.settings = {
     peerUri : "http://127.0.0.1:8545",
     web3 : null,
-    reloadInterval: 2000,
+    reloadInterval: 1500,
 		blockCount:7,
 		//current value unit
 		unit:"wei",
