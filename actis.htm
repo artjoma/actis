@@ -11,6 +11,7 @@
     <script type="text/javascript" src="lib/angular/angular-resource.min.js"></script>
     <script type="text/javascript" src="lib/angular/angular-cookies.min.js"></script>
     <script type="text/javascript" src="lib/angular/angular-sanitize.min.js"></script>
+    <script type="text/javascript" src="lib/angular/angular-local-storage.min.js"></script>
     <!-- bootstrap -->
     <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css?3.1.1"/>
   	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css?3.1.1"/>
@@ -35,8 +36,8 @@
        <div id="navbar" class="navbar-collapse collapse">
          <ul class="nav  navbar-nav topPanel">
            <li style="margin-left:40px;width:200px">
-              <div>Peer address</div>
-              <div>{{settings.peerUri}}</div>
+              <div>Peer address <span class="objField2">{{settings.peerName}}</span></div>
+              <div>{{appConfig.peers[settings.peerName].peerUri}}</div>
            </li>
             <li>
               <div>Netw. prot. ver.</div>
@@ -307,31 +308,59 @@
       Settings modal
     -->
     <div id="settingsModal" class="modal fade" role="dialog">
-      <div class="modal-dialog">
+      <div class="modal-dialog modalSettings">
         <div class="modal-content">
-          <form name="chageActisSettingsForm" ng-submit="applySettings(chageActisSettingsForm)" novalidate>
+          <form name="chageActisSettingsForm" ng-submit="connectToPeer(chageActisSettingsForm)" novalidate>
             <div class="modal-header">
               <button type="button" class="close" data-dismiss="modal">&times;</button>
               <h4 class="modal-title">Actis configuration</h4>
             </div>
             <div class="modal-body">
-              <div class="err">{{settingsErr}}</div>
-              <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerUri.$invalid && !chageActisSettingsForm.peerUri.$pristine}">
-                  <label>RPC node address</label>
-                  <input type="text" ng-maxlength="50" ng-minlength="8" class="form-control" placeholder="Enter peer address. Example: http://127.0.0.1:8545" name="peerUri" ng-model="$root.settings.peerUri"  required>
-                  <p ng-show="chageActisSettingsForm.peerUri.$error.minlength" class="help-block">Peer address is too short.</p>
+              <div>
+                  <input type="button" value="New peer" class="btn btn-default btn-sm" ng-click="addPeer()"/>
               </div>
-              <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.blockCount.$invalid && !chageActisSettingsForm.blockCount.$pristine}">
-                  <label>Show blocks count</label>
-                  <input type="text" onkeypress="return isNumberKey(event, this)" ng-maxlength="2" ng-minlength="1" class="form-control" placeholder="Block count" name="blockCount" ng-model="$root.settings.blockCount"  required>
-                  <p ng-show="chageActisSettingsForm.blockCount.$error.minlength" class="help-block">Invalid block count</p>
-              </div>
+              <div class="row">
+                  <div class="col-md-5">
+                      <div style="font-weight:bold;margin-top:20px">Peers:</div>
+                      <ul>
+                      <li ng-repeat="(peerName,peer) in appConfig.peers">
+                        <a ng-click="switchPeer(peerName)" class="specA" title="{{peer.peerUri}}">{{peerName}}</a>
+                      </li>
+                    </ul>
+                  </div>
+                  <div class="col-md-7">
+                    <div class="err">{{settingsErr}}</div>
+                    <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerName.$invalid && !chageActisSettingsForm.peerName.$pristine}">
+                        <label>Peer name</label>
+                        <input type="text" ng-maxlength="30" ng-minlength="2" class="form-control input-sm" placeholder="Connection name" name="peerName" ng-model="peer.peerName"  required>
+                        <p ng-show="chageActisSettingsForm.peerName.$error.minlength" class="help-block">Peer name is too short.</p>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerUri.$invalid && !chageActisSettingsForm.peerUri.$pristine}">
+                        <label>RPC node address</label>
+                        <input type="text" ng-maxlength="50" ng-minlength="8" class="form-control input-sm" placeholder="Enter peer address. Example: http://127.0.0.1:8545" name="peerUri"
+                                  ng-model="peer.peerUri"  required>
+                        <p ng-show="chageActisSettingsForm.peerUri.$error.minlength" class="help-block">Peer address is too short.</p>
+                    </div>
+                    <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.blockCount.$invalid && !chageActisSettingsForm.blockCount.$pristine}">
+                        <label>Show blocks count</label>
+                        <input type="text" onkeypress="return isNumberKey(event, this)" ng-maxlength="2" ng-minlength="1" class="form-control input-sm" placeholder="Block count"
+                                  name="blockCount" ng-model="peer.blockCount"  required>
+                        <p ng-show="chageActisSettingsForm.blockCount.$error.minlength" class="help-block">Invalid block count</p>
+                    </div>
+                    <div class="pull-right">
+                      <button type="button" class="btn btn-info btn-sm" ng-show="appConfig.peers[settings.peer.peerName]!=null" ng-disabled="chageActisSettingsForm.$invalid" ng-click="deletePeer(peer.peerName)">Delete</button>
+                      <button type="button" class="btn btn-info btn-sm" ng-disabled="chageActisSettingsForm.$invalid"  ng-click="savePeer()">Save</button>
+                      <button type="submit" class="btn btn-info btn-sm" ng-disabled="chageActisSettingsForm.$invalid">Connect</button>
+                    </div>
+                  </div>
+
             </div>
-            <div class="modal-footer">
-              <button type="submit" class="btn btn-info" ng-disabled="chageActisSettingsForm.$invalid">Apply</button>
-              <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
+
           </form>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
         </div>
       </div>
     </div>

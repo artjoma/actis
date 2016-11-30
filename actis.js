@@ -1,4 +1,4 @@
- var app = angular.module("ActisApp", ["ngCookies", "ngSanitize"]);
+ var app = angular.module("ActisApp", ["LocalStorageModule", "ngSanitize"]);
 
 app.filter('utc', function(){
 	return function(val){
@@ -37,13 +37,30 @@ function isNumberKey(evt, objInput){
 	}
 	return true;
 }
+
+var STORAGE_KEY_ACTIS_CONFIG = "actis.config";
+
+app.config(function (localStorageServiceProvider) {
+  localStorageServiceProvider.setPrefix('actis').setStorageType('localStorage').setNotify(true, true);
+});
 //Init app
-app.run(function ($rootScope, uiService) {
+app.run(function ($rootScope, uiService, localStorageService) {
+ //load from storage configuration
+  $rootScope.appConfig = localStorageService.get(STORAGE_KEY_ACTIS_CONFIG);
+  if ($rootScope.appConfig == null){
+    $rootScope.appConfig = {
+      peers:{}
+    }
+
+    $rootScope.appConfig.peers["localhost"]={peerName:"localhost", peerUri:"http://127.0.0.1:8545", blockCount:7};
+
+  }
+
   $rootScope.settings = {
-    peerUri : "http://127.0.0.1:8545",
+    //selected peer
+    peerName:null,
     web3 : null,
     reloadInterval: 1500,
-		blockCount:7,
 		//current value unit
 		unit:"wei",
 		units:["wei", "kwei", "mwei", "gwei","szabo", "finney","ether","kether","mether","gether","tether"]
@@ -70,16 +87,16 @@ app.run(function ($rootScope, uiService) {
  uiService.initUI();
 });
 
-app.service('uiService', function ($rootScope, $location, $http, $timeout, $interval) {
+app.service('uiService', function ($rootScope, $http, $timeout, $interval) {
   var self = this;
-  var blockArr = null;
 
   this.initUI = function () {
-    blockArr = $rootScope.ui.blockArr;
+    $rootScope.settings.peer = $rootScope.appConfig.peers["localhost"];
 		$rootScope.ui.reloadInterval = $interval(function(){self.loadData()}, $rootScope.settings.reloadInterval);
   }
 
   this.loadData = function (){
+      var blockArr = $rootScope.ui.blockArr;
 			var web3 = $rootScope.settings.web3;
 
 			if (web3 != null){
@@ -93,7 +110,7 @@ app.service('uiService', function ($rootScope, $location, $http, $timeout, $inte
 							//add only latest block
 							if (blockArr[0].number != block.number){
 								blockArr.unshift(block);
-								if (blockArr.length > $rootScope.settings.blockCount){
+								if (blockArr.length > $rootScope.settings.peer.blockCount){
 									blockArr.pop();
 								}
 							}
@@ -136,13 +153,32 @@ app.service('uiService', function ($rootScope, $location, $http, $timeout, $inte
   	}
 });
 
-app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval','uiService', function($scope, $rootScope, $timeout, $interval, uiService) {
+app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval','uiService','localStorageService', function($scope, $rootScope, $timeout, $interval, uiService, localStorageService) {
 	$scope.userTabs = {};
 	$scope.tabSelected = "";
 	var web3;
+  $scope.peer = {};
 
-	$scope.applySettings = function (formObj) {
-		web3 = new Web3(new Web3.providers.HttpProvider($rootScope.settings.peerUri));
+ $scope.switchPeer = function(peerName){
+     $scope.peer = $rootScope.appConfig.peers[peerName];
+ }
+ $scope.deletePeer = function(peerName){
+     $scope.peer = null;
+     delete $rootScope.appConfig.peers[peerName];
+     localStorageService.set(STORAGE_KEY_ACTIS_CONFIG, $rootScope.appConfig);
+ }
+ $scope.addPeer = function(){
+     $scope.peer = {blockCount:7}
+ }
+ $scope.savePeer = function(){
+     $rootScope.appConfig.peers[$scope.peer.peerName]=$scope.peer;
+     localStorageService.set(STORAGE_KEY_ACTIS_CONFIG, $rootScope.appConfig);
+ }
+ $scope.connectToPeer = function (formObj) {
+   $scope.settingsErr = null;
+   $rootScope.ui.blockArr = [];
+   $rootScope.settings.peerName =  $scope.peer.peerName;
+		web3 = new Web3(new Web3.providers.HttpProvider($scope.peer.peerUri));
 		if(web3.isConnected()) {
 				$rootScope.settings.web3 = web3;
 				$rootScope.ui.networkProtocolVer = web3.version.network;
@@ -150,7 +186,7 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 
 				$('#settingsModal').modal('hide');
 		}else{
-				$scope.settingsErr = "Can't connect to node !"
+				$scope.settingsErr = "Can't connect to peer !"
 		}
 	}
 	//search
@@ -210,18 +246,27 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 				var len = block.transactions.length;
 				var tx = null;
 				//is addresses as contract ?
-				for (var i = 0; i <  len;i++  ){
+				for (var i = 0; i <  len; i++ ){
 						tx = block.transactions[i];
 						//to
 						if (tx.to == null){
 							 //if created contract, field "to" is null, we should use getTransactionReceipt to recognize a contract address
 								var txReceipt = web3.eth.getTransactionReceipt(tx.hash);
+
 								if (txReceipt.contractAddress == null){
 										//contract not mined
 									tx.toContr = "E";
+                  tx.to = "Err. Contract not mined !";
 								}else{
-									tx.toContr = "M";
-									tx.to = txReceipt.contractAddress;
+                    //we should check contract code. If contract created with error.
+                   var code = web3.eth.getCode(txReceipt.contractAddress);
+                   if (code == "0x"){
+                     		tx.toContr = "E";
+                        tx.to = "Err. Contract not saved at state !";
+                   }else{
+                     tx.toContr = "M";
+                     tx.to = txReceipt.contractAddress;
+                   }
 								}
 						}else{
 							if (web3.eth.getCode(tx.to) == "0x"){

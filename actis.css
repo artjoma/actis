@@ -69,3 +69,6 @@ td {
 .progressBarHide{
    visibility: hidden;
 }
+.modalSettings{
+   width: 720px;
+}
