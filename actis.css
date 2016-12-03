@@ -44,9 +44,10 @@ td {
 }
 
 .controlSelect{
-	height: 25px !important;
-	padding: 2px 2px !important;
+	height: 20px !important;
+	padding: 0px 0px !important;
   font-size: 12px;
+  width:70%;
 }
 .specA{
   color:#3C3C3C;
@@ -71,4 +72,10 @@ td {
 }
 .modalSettings{
    width: 720px;
+}
+.inputTdCell{
+  padding:0px 0px;
+  border: 0px;
+  height:14px;
+  width:100%;
 }

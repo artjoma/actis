@@ -39,6 +39,7 @@ function isNumberKey(evt, objInput){
 }
 
 var STORAGE_KEY_ACTIS_CONFIG = "actis.config";
+var STORAGE_CONTRACT_PREFFIX = "contr."
 
 app.config(function (localStorageServiceProvider) {
   localStorageServiceProvider.setPrefix('actis').setStorageType('localStorage').setNotify(true, true);
@@ -158,6 +159,7 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 	$scope.tabSelected = "";
 	var web3;
   $scope.peer = {};
+  $scope.contractDetails = {};
 
  $scope.switchPeer = function(peerName){
      $scope.peer = $rootScope.appConfig.peers[peerName];
@@ -189,6 +191,38 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 				$scope.settingsErr = "Can't connect to peer !"
 		}
 	}
+
+  $scope.showContractsCovernance = function (address){
+      var keys = localStorageService.keys();
+    //  var count =  keys.length();
+      $scope.contracts = {};
+      console.log (keys);
+      $scope.addTab("contracts", $scope.contracts);
+      for (index in keys){
+          if(keys[index].startsWith(STORAGE_CONTRACT_PREFFIX)){
+            contract = localStorageService.get(keys[index]);
+            $scope.contracts[contract.contractAddress] = contract;
+          }
+      }
+  }
+  /*
+    Contract details
+  */
+  $scope.addContract = function (formObj){
+      $scope.contractDetails.contractABI =  $scope.contractDetails.contractABI.trim();
+      localStorageService.set(STORAGE_CONTRACT_PREFFIX + $scope.contractDetails.contractAddress, $scope.contractDetails);
+      $scope.contracts[$scope.contractDetails.contractAddress] = $scope.contractDetails;
+      $scope.contractDetails = { contractAddress:"", contractName:"", contractVersion:""};
+  }
+  $scope.deleteContract = function (contractAddress){
+      localStorageService.remove(STORAGE_CONTRACT_PREFFIX + contractAddress);
+      $scope.contractDetails = { contractAddress:"", contractName:"", contractVersion:""};
+      delete $scope.contracts[contractAddress];
+  }
+  $scope.editContract = function (contractAddress){
+      $scope.contractDetails = $scope.contracts[contractAddress];
+  }
+
 	//search
 	$scope.searchComponent = function (){
 		$scope.infoSearch = ""
@@ -214,7 +248,6 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 		}else{
 			var blockNumber = parseInt(searchStr);
 			if (Number.isNaN(blockNumber)){
-				//web3.eth.getBlock("latest")
 				tabId = "Can't recognize input string";
 			}else{
 				//block number
@@ -315,8 +348,21 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 				addrObj.storageAt = web3.eth.getStorageAt(address, 0);
 				addrObj.code = web3.eth.getCode(address);
 				addrObj.txCount = 	web3.eth.getTransactionCount(address);
+        addrObj.eventArr = [];
 				$scope.addTab($scope.infoSearch, addrObj);
 				$rootScope.ui.showProgress = false;
+        //try get contract details from local storage
+        var contractDetails = localStorageService.get(STORAGE_CONTRACT_PREFFIX + address);
+        if (contractDetails != null){
+            addrObj.contractDetails = contractDetails;
+            var contract = web3.eth.contract(JSON.parse(contractDetails.contractABI));
+            var contractInstance = contract.at(address);
+
+            var events = contractInstance.allEvents({fromBlock: 0, toBlock: 'latest'});
+            events.watch(function(error, result){
+                addrObj.eventArr.push(result);
+            });
+        }
 		 }
 		});
 	}

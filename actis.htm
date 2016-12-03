@@ -63,11 +63,13 @@
              <div>ETH units</div>
              <select class="form-control controlSelect" ng-model="$root.settings.unit"  ng-options="unit as unit for unit in settings.units" ng-change="changeETHUnit()"></select>
            </li>
-
+           <li>
+             <span class="glyphicon glyphicon-file" ng-click="showContractsCovernance(null)" title="Contracts governance" style="font-size:22px;cursor:pointer;margin-top:12px;" aria-hidden="true"></span>
+           </li>
 
          </ul>
-         <ul class="nav navbar-nav navbar-right" style="margin-top:10px;margin-right:1px">
-           <li><span class="glyphicon glyphicon-cog" style="font-size:28px;cursor:pointer" aria-hidden="true" data-toggle="modal" data-target="#settingsModal"></span></li>
+         <ul class="nav navbar-nav navbar-right" style="margin-top:12px;margin-right:1px">
+           <li><span class="glyphicon glyphicon-cog" title="Settings" style="font-size:26px;cursor:pointer" aria-hidden="true" data-toggle="modal" data-target="#settingsModal"></span></li>
          </ul>
        </div>
      </div>
@@ -267,36 +269,112 @@
 
                     <div ng-show="tabName.startsWith('addr')">
                       <div class="row">
-                        <div class="col-md-5">
+                        <div class="col-md-4">
                             <div class="row">
-                                <div class="col-md-3 objField" title="String - 20 Bytes - Address">address:</div>
-                                <div class="col-md-9">{{obj.address}}</div>
+                                <div class="col-md-2 objField" title="String - 20 Bytes - Address">address:</div>
+                                <div class="col-md-10">{{obj.address}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 objField" title="BigNumber - balance">balance:</div>
-                                <div class="col-md-9">{{obj.balance  | units : settings.unit}}</div>
+                                <div class="col-md-2 objField" title="BigNumber - balance">balance:</div>
+                                <div class="col-md-10">{{obj.balance  | units : settings.unit}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 objField" title="Is contract ?">is contract ?</div>
-                                <div class="col-md-9" ng-show="obj.code == '0x'">No</div>
-                                <div class="col-md-9" ng-show="obj.code != '0x'">Yes</div>
+                                <div class="col-md-2 objField" title="Is contract ?">is contract ?</div>
+                                <div class="col-md-10" ng-show="obj.code == '0x'">No</div>
+                                <div class="col-md-10" ng-show="obj.code != '0x'">
+                                  Yes.
+                                  <span class="objField2" ng-show="obj.contractDetails == null">Contract not registered in governance</span>
+                                  <span class="objField2" ng-show="obj.contractDetails != null">
+                                      {{obj.contractDetails.contractName}}/{{obj.contractDetails.contractVersion}}
+                                  </span>
+                                </div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 objField" title="BigNumber - numbers of transactions sent from this address">txCount:</div>
-                                <div class="col-md-9">{{obj.txCount}}</div>
+                                <div class="col-md-2 objField" title="BigNumber - numbers of transactions sent from this address">txCount:</div>
+                                <div class="col-md-10">{{obj.txCount}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 objField" title="String - storage at a specific position of an address. Show only position 0">storageAt:</div>
-                                <div class="col-md-9 bigText">{{obj.storageAt}}</div>
+                                <div class="col-md-2 objField" title="String - storage at a specific position of an address. Show only position 0">storageAt:</div>
+                                <div class="col-md-10 bigText">{{obj.storageAt}}</div>
                             </div>
                             <div class="row">
-                                <div class="col-md-3 objField" title="String - the code at a specific address.">code:</div>
-                                <div class="col-md-9 bigText">{{obj.code}}</div>
+                                <div class="col-md-2 objField" title="String - the code at a specific address.">code:</div>
+                                <div class="col-md-10 bigText">{{obj.code}}</div>
                             </div>
+                      </div>
+                      <div class="col-md-8">
+                        <table class="table">
+                              <thead>
+                                  <tr>
+                                      <th>Block</th><th>Tx hash</th><th>Event</th><th>Args</th>
+                                  </tr>
+                              </thead>
+                              <tbody>
+                                  <tr ng-repeat="event in obj.eventArr">
+                                    <td><a ng-click="openBlockTab(event.blockNumber)" class="specA">{{event.blockNumber}}</a></td>
+                                    <td><a ng-click="openTxTab(event.transactionHash)" class="specA">{{event.transactionHash}}</a></td>
+                                    <td>{{event.event}}</td>
+                                    <td>{{event.args}}</td>
+                                  </tr>
+                              </tbody>
+                          </table>
                       </div>
                     </div>
                 </div>
 
+                <div ng-show="tabName.startsWith('contracts')">
+                    <div class="row">
+                          <div class="col-md-3" style="margin-top:12px">
+                                  <form name="addContractForm" ng-submit="addContract(addContractForm)" novalidate>
+                                    <div class="form-group" ng-class="{'has-error' : addContractForm.contractAddress.$invalid && !addContractForm.contractAddress.$pristine}">
+                                        <label>Contract address</label>
+                                        <input type="text" ng-maxlength="42"  maxlength="42" ng-minlength="42" class="form-control input-sm" placeholder="Contract address" name="contractAddress" ng-model="contractDetails.contractAddress"  required>
+                                        <p ng-show="addContractForm.contractAddress.$error.minlength" class="help-block">Contract address is too short</p>
+                                    </div>
+                                    <div class="form-group" ng-class="{'has-error' : addContractForm.contractName.$invalid && !addContractForm.contractName.$pristine}">
+                                        <label>Contract name</label>
+                                        <input type="text" ng-maxlength="30"  maxlength="30" ng-minlength="2" class="form-control input-sm" placeholder="Contract name" name="contractName" ng-model="contractDetails.contractName"  required>
+                                        <p ng-show="addContractForm.contractName.$error.minlength" class="help-block">Contract name is too short</p>
+                                    </div>
+                                    <div class="form-group" ng-class="{'has-error' : addContractForm.contractVersion.$invalid && !addContractForm.contractVersion.$pristine}">
+                                        <label>Contract version</label>
+                                        <input type="text" ng-maxlength="20" maxlength="20" ng-minlength="2" class="form-control input-sm" placeholder="Contract version" name="contractVersion"
+                                                  ng-model="contractDetails.contractVersion"  required>
+                                        <p ng-show="addContractForm.contractVersion.$error.minlength" class="help-block">Contract version</p>
+                                    </div>
+                                    <div>
+                                        <label>Contract ABI</label>
+                                        <textarea  style="height:300px" class="form-control input-sm" placeholder="Contract ABI" name="contractABI" ng-model="contractDetails.contractABI"></textarea>
+                                    </div>
+                                    <div class="pull-right" style="margin-top:10px">
+                                      <button type="submit" class="btn btn-info btn-sm" ng-disabled="addContractForm.$invalid">Add contract</button>
+                                    </div>
+                                  </form>
+                          </div>
+                          <div class="col-md-9">
+                            <table class="table">
+                                  <thead>
+                                      <tr>
+                                          <th width="25%">Address</th><th width="20%">Name</th><th width="10%">Version</th><th width="40%">ABI</th><th width="5%">Edit</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <tr ng-repeat="contract in obj">
+                                        <td><a ng-click="openAddressTab(contract.contractAddress)" class="specA">{{contract.contractAddress}}</a></td>
+                                        <td>{{contract.contractName}}</td>
+                                        <td>{{contract.contractVersion}}</td>
+                                        <td><input type="text" class="inputTdCell" readonly="true" value="{{contract.contractABI}}"/></td>
+                                        <td>
+                                          <span class="glyphicon glyphicon-pencil" title="Edit" style="cursor:pointer;font-size:14px" aria-hidden="true" ng-click="editContract(contract.contractAddress)"></span>
+                                          <span class="glyphicon glyphicon-remove" title="Delete" style="cursor:pointer;font-size:14px;margin-left:10px" aria-hidden="true" ng-click="deleteContract(contract.contractAddress)"></span>
+                                        </td>
+                                      </tr>
+                                  </tbody>
+                                </table>
+                          </div>
+                    </div>
+
+                </div>
 
           </div>
         </div>
@@ -332,18 +410,18 @@
                     <div class="err">{{settingsErr}}</div>
                     <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerName.$invalid && !chageActisSettingsForm.peerName.$pristine}">
                         <label>Peer name</label>
-                        <input type="text" ng-maxlength="30" ng-minlength="2" class="form-control input-sm" placeholder="Connection name" name="peerName" ng-model="peer.peerName"  required>
+                        <input type="text" ng-maxlength="30" maxlength="30"  ng-minlength="2" class="form-control input-sm" placeholder="Connection name" name="peerName" ng-model="peer.peerName"  required>
                         <p ng-show="chageActisSettingsForm.peerName.$error.minlength" class="help-block">Peer name is too short.</p>
                     </div>
                     <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerUri.$invalid && !chageActisSettingsForm.peerUri.$pristine}">
                         <label>RPC node address</label>
-                        <input type="text" ng-maxlength="50" ng-minlength="8" class="form-control input-sm" placeholder="Enter peer address. Example: http://127.0.0.1:8545" name="peerUri"
+                        <input type="text" ng-maxlength="50" maxlength="50" ng-minlength="8" class="form-control input-sm" placeholder="Enter peer address. Example: http://127.0.0.1:8545" name="peerUri"
                                   ng-model="peer.peerUri"  required>
                         <p ng-show="chageActisSettingsForm.peerUri.$error.minlength" class="help-block">Peer address is too short.</p>
                     </div>
                     <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.blockCount.$invalid && !chageActisSettingsForm.blockCount.$pristine}">
                         <label>Show blocks count</label>
-                        <input type="text" onkeypress="return isNumberKey(event, this)" ng-maxlength="2" ng-minlength="1" class="form-control input-sm" placeholder="Block count"
+                        <input type="text" onkeypress="return isNumberKey(event, this)" maxlength="3" ng-maxlength="3" ng-minlength="1" class="form-control input-sm" placeholder="Block count"
                                   name="blockCount" ng-model="peer.blockCount"  required>
                         <p ng-show="chageActisSettingsForm.blockCount.$error.minlength" class="help-block">Invalid block count</p>
                     </div>
