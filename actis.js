@@ -194,9 +194,7 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 
   $scope.showContractsCovernance = function (address){
       var keys = localStorageService.keys();
-    //  var count =  keys.length();
       $scope.contracts = {};
-      console.log (keys);
       $scope.addTab("contracts", $scope.contracts);
       for (index in keys){
           if(keys[index].startsWith(STORAGE_CONTRACT_PREFFIX)){
@@ -209,7 +207,8 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
     Contract details
   */
   $scope.addContract = function (formObj){
-      $scope.contractDetails.contractABI =  $scope.contractDetails.contractABI.trim();
+      //trim and remove \" if code copied from abigen result (contract golang binding source)
+      $scope.contractDetails.contractABI =  ($scope.contractDetails.contractABI + "").trim().replace(/\\/g, '');
       localStorageService.set(STORAGE_CONTRACT_PREFFIX + $scope.contractDetails.contractAddress, $scope.contractDetails);
       $scope.contracts[$scope.contractDetails.contractAddress] = $scope.contractDetails;
       $scope.contractDetails = { contractAddress:"", contractName:"", contractVersion:""};
@@ -360,7 +359,7 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 
             var events = contractInstance.allEvents({fromBlock: 0, toBlock: 'latest'});
             events.watch(function(error, result){
-                addrObj.eventArr.push(result);
+                addrObj.eventArr.unshift(result);
             });
         }
 		 }
