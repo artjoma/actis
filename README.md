@@ -7,8 +7,8 @@ Benefits:
   <li>Show details about blocks, transactions, addresses.</li>
   <li>Show mined contracts.</li>
   <li>Save personal settings to browser storage.</li>
-  <li>Contracts governance</li>
-  <li>View contract event logs</li>
+  <li>Contracts governance.</li>
+  <li>View contract event logs.</li>
 </ul>
 
 Actis is Ethereum Dapp application that based on Web3.js.
