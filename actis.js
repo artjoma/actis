@@ -61,7 +61,7 @@ app.run(function ($rootScope, uiService, localStorageService) {
     //selected peer
     peerName:null,
     web3 : null,
-    reloadInterval: 1500,
+    reloadInterval: 1000,
 		//current value unit
 		unit:"wei",
 		units:["wei", "kwei", "mwei", "gwei","szabo", "finney","ether","kether","mether","gether","tether"]
