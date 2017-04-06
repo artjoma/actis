@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" ng-app="ActisApp">
-  <head>
+<head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <title>Actis</title>
 
@@ -14,103 +14,103 @@
     <script type="text/javascript" src="lib/angular/angular-local-storage.min.js"></script>
     <!-- bootstrap -->
     <link rel="stylesheet" href="lib/bootstrap/css/bootstrap.min.css?3.1.1"/>
-  	<link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css?3.1.1"/>
-  	<script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js?3.1.1"></script>
+    <link rel="stylesheet" href="lib/bootstrap/css/bootstrap-theme.min.css?3.1.1"/>
+    <script type="text/javascript" src="lib/bootstrap/js/bootstrap.min.js?3.1.1"></script>
     <!-- eth web3.js API connector -->
     <script type="text/javascript" src="lib/web3.min.js"></script>
     <!-- actis -->
     <link rel="stylesheet" href="actis.css"/>
     <script type="text/javascript" src="actis.js"></script>
-  </head>
+</head>
 
-  <body ng-controller="mainController" style="color:#3C3C3C;font-size:13px">
-    <!--
-      Top panel
-    -->
-    <nav class="navbar navbar-default navbar-fixed-top">
-     <div class="container-fluid">
-       <div class="navbar-header">
-         <a class="navbar-brand" href="#" style="color:#ED723D;font-size:26px">ACTIS</a>
-       </div>
-
-       <div id="navbar" class="navbar-collapse collapse">
-         <ul class="nav  navbar-nav topPanel">
-           <li style="margin-left:40px;width:200px">
-              <div>Peer address <span class="objField2">{{settings.peerName}}</span></div>
-              <div>{{appConfig.peers[settings.peerName].peerUri}}</div>
-           </li>
-            <li>
-              <div>Netw. prot. ver.</div>
-              <div>{{ui.networkProtocolVer}}</div>
-            </li>
-            <li>
-               <div>ETH prot. ver.</div>
-               <div>{{ui.ethProtocolVer}}</div>
-          </li>
-          <li>
-            <div>Is mining</div>
-            <div  ng-style="{'color': ui.mining ? '#D9534F':''}">{{ui.mining}}</div>
-          </li>
-           <li ng-show="ui.mining">
-             <div>Peer hash rate(H/s)</div>
-             <div>{{ui.hashRate}}</div>
-           </li>
-           <li>
-             <div>Gas price</div>
-             <div>{{ui.gasPrice  | units : settings.unit}}</div>
-           </li>
-           <li>
-             <div>ETH units</div>
-             <select class="form-control controlSelect" ng-model="$root.settings.unit"  ng-options="unit as unit for unit in settings.units" ng-change="changeETHUnit()"></select>
-           </li>
-           <li>
-             <span class="glyphicon glyphicon-file" ng-click="showContractsCovernance(null)" title="Contracts governance" style="font-size:22px;cursor:pointer;margin-top:12px;" aria-hidden="true"></span>
-           </li>
-
-         </ul>
-         <ul class="nav navbar-nav navbar-right" style="margin-top:12px;margin-right:1px">
-           <li><span class="glyphicon glyphicon-cog" title="Settings" style="font-size:26px;cursor:pointer" aria-hidden="true" data-toggle="modal" data-target="#settingsModal"></span></li>
-         </ul>
-       </div>
-     </div>
-   </nav>
-
-   <div style="margin-top:5px;margin-left:10px" ng-hide="settings.web3==null">
-       <div class="list-group list-group-horizontal">
-         <div class="list-group-item">
-           <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab('pending')" style="cursor: pointer;">pending</a></h4>
-           <p class="list-group-item-text">tx: {{$root.ui.pendingBlock.transactions.length}}</p>
-         </div>
-        <div class="list-group-item" ng-repeat="block in ui.blockArr" style="width:190px">
-          <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab(block.number)" style="cursor: pointer;">{{block.number}}</a></h4>
-          <p class="list-group-item-text">time: {{block.timestamp | utc | date:'HH:mm:ss'}} tx: <span ng-class="{objField : block.transactions.length > 0}">{{block.transactions.length}}</span></p>
+<body ng-controller="mainController" style="color:#3C3C3C;font-size:13px">
+<!--
+  Top panel
+-->
+<nav class="navbar navbar-default navbar-fixed-top">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a class="navbar-brand" href="#" style="color:#ED723D;font-size:26px">ACTIS</a>
         </div>
-      </div>
 
-      <div class="container-fluid" ng-hide="settings.web3==null">
-            <div class="row" >
-                <div class="col-md-4" style="padding-right:0px">
-                    <input type="text"  class="form-control" placeholder="Block, transaction, address | Press Enter to search"  maxlength="100"  ng-model="searchString"  ng-keyup="$event.keyCode == 13 && searchComponent()"/>
-                </div>
-                <div class="col-md-8" style="padding-left:0px">
-                    <img src="img/loader.gif"  style="height:36px" ng-style="{'visibility': ui.showProgress ? 'visible':'hidden'}" /> Last search: {{infoSearch}}
-                </div>
-            </div>
-            <!-- Nav tabs -->
-            <ul id="tab-list" class="nav nav-tabs" role="tablist" style="margin-top:5px">
-                <li ng-repeat="(tabName, tabValue) in userTabs" ng-class="{'active' :  tabSelected==tabName}" style="cursor:pointer">
-                  <a style="padding:6px 10px" ng-click="selectTab(tabName)">{{tabName.substring(0,15)}} <span class="glyphicon glyphicon-remove" aria-hidden="true"  ng-click="closeTab(tabName)"></span></a>
+        <div id="navbar" class="navbar-collapse collapse">
+            <ul class="nav  navbar-nav topPanel">
+                <li style="margin-left:40px;width:200px">
+                    <div>Peer address <span class="objField2">{{settings.peerName}}</span></div>
+                    <div>{{appConfig.peers[settings.peerName].peerUri}}</div>
                 </li>
-            </ul>
-            <!--
-              Tab panes
-            -->
-            <div class="tab-content">
-                <div  ng-repeat="(tabName, obj) in userTabs"  ng-show="tabSelected == tabName">
+                <li>
+                    <div>Netw. prot. ver.</div>
+                    <div>{{ui.networkProtocolVer}}</div>
+                </li>
+                <li>
+                    <div>ETH prot. ver.</div>
+                    <div>{{ui.ethProtocolVer}}</div>
+                </li>
+                <li>
+                    <div>Is mining</div>
+                    <div  ng-style="{'color': ui.mining ? '#D9534F':''}">{{ui.mining}}</div>
+                </li>
+                <li ng-show="ui.mining">
+                    <div>Peer hash rate(H/s)</div>
+                    <div>{{ui.hashRate}}</div>
+                </li>
+                <li>
+                    <div>Gas price</div>
+                    <div>{{ui.gasPrice  | units : settings.unit}}</div>
+                </li>
+                <li>
+                    <div>ETH units</div>
+                    <select class="form-control controlSelect" ng-model="$root.settings.unit"  ng-options="unit as unit for unit in settings.units" ng-change="changeETHUnit()"></select>
+                </li>
+                <li>
+                    <span class="glyphicon glyphicon-file" ng-click="showContractsCovernance(null)" title="Contracts governance" style="font-size:22px;cursor:pointer;margin-top:12px;" aria-hidden="true"></span>
+                </li>
 
-                      <div ng-show="tabName.startsWith('block')">
-                        <div class="row">
-                          <div class="col-md-3">
+            </ul>
+            <ul class="nav navbar-nav navbar-right" style="margin-top:12px;margin-right:1px">
+                <li><span class="glyphicon glyphicon-cog" title="Settings" style="font-size:26px;cursor:pointer" aria-hidden="true" data-toggle="modal" data-target="#settingsModal"></span></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div style="margin-top:5px;margin-left:10px" ng-hide="settings.web3==null">
+    <div class="list-group list-group-horizontal">
+        <div class="list-group-item">
+            <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab('pending')" style="cursor: pointer;">pending</a></h4>
+            <p class="list-group-item-text">tx: {{$root.ui.pendingBlock.transactions.length}}</p>
+        </div>
+        <div class="list-group-item" ng-repeat="block in ui.blockArr" style="width:190px">
+            <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab(block.number)" style="cursor: pointer;">{{block.number}}</a></h4>
+            <p class="list-group-item-text">time: {{block.timestamp | utc | date:'HH:mm:ss'}} tx: <span ng-class="{objField : block.transactions.length > 0}">{{block.transactions.length}}</span></p>
+        </div>
+    </div>
+
+    <div class="container-fluid" ng-hide="settings.web3==null">
+        <div class="row" >
+            <div class="col-md-4" style="padding-right:0px">
+                <input type="text"  class="form-control" placeholder="Block, transaction, address | Press Enter to search"  maxlength="100"  ng-model="searchString"  ng-keyup="$event.keyCode == 13 && searchComponent()"/>
+            </div>
+            <div class="col-md-8" style="padding-left:0px">
+                <img src="img/loader.gif"  style="height:36px" ng-style="{'visibility': ui.showProgress ? 'visible':'hidden'}" /> Last search: {{infoSearch}}
+            </div>
+        </div>
+        <!-- Nav tabs -->
+        <ul id="tab-list" class="nav nav-tabs" role="tablist" style="margin-top:5px">
+            <li ng-repeat="(tabName, tabValue) in userTabs" ng-class="{'active' :  tabSelected==tabName}" style="cursor:pointer">
+                <a style="padding:6px 10px" ng-click="selectTab(tabName)">{{tabName.substring(0,15)}} <span class="glyphicon glyphicon-remove" aria-hidden="true"  ng-click="closeTab(tabName)"></span></a>
+            </li>
+        </ul>
+        <!--
+          Tab panes
+        -->
+        <div class="tab-content">
+            <div  ng-repeat="(tabName, obj) in userTabs"  ng-show="tabSelected == tabName">
+
+                <div ng-show="tabName.startsWith('block')">
+                    <div class="row">
+                        <div class="col-md-3">
                             <div class="row">
                                 <div class="col-md-3 objField" title="The block number,  null when its pending block">number:</div><div class="col-md-9">{{obj.number}}</div>
                             </div>
@@ -132,143 +132,143 @@
                             <div class="row">
                                 <div class="col-md-3 objField" title="Number - integer the size of this block in bytes.">size:</div><div class="col-md-9">{{obj.size}}</div>
                             </div>
-                          </div>
+                        </div>
 
-                          <div class="col-md-5">
-                              <div class="row">
+                        <div class="col-md-5">
+                            <div class="row">
                                 <div class="col-md-2 objField" title="32 Bytes - hash of the block. null when its pending block.">hash:</div><div class="col-md-10">{{obj.hash}}</div>
-                              </div>
-                              <div class="row">
+                            </div>
+                            <div class="row">
                                 <div class="col-md-2 objField" title="32 Bytes - hash of the parent block.">parentHash:</div><div class="col-md-10"><a ng-click="openBlockTab(obj.parentHash)"  class="specA">{{obj.parentHash}}</a></div>
-                              </div>
-                              <div class="row">
+                            </div>
+                            <div class="row">
                                 <div class="col-md-2 objField" title="String, 20 Bytes - the address of the beneficiary to whom the mining rewards were given.">miner:</div>
                                 <div class="col-md-10"><a class="specA" ng-click="openAddressTab(obj.miner)">{{obj.miner}}</a></div>
-                              </div>
-                              <div class="row">
-                                <div class="col-md-2 objField" title="32 Bytes - the root of the transaction trie of the block.">transactionsRoot:</div><div class="col-md-9">{{obj.transactionsRoot}}</div>
-                              </div>
-                              <div class="row">
-                                <div class="col-md-2 objField" title="32 Bytes - the root of the final state trie of the block.">stateRoot:</div><div class="col-md-10">{{obj.stateRoot}}</div>
-                              </div>
-                              <div class="row">
-                                <div class="col-md-2 objField" title="32 Bytes - SHA3 of the uncles data in the block.">sha3Uncles:</div><div class="col-md-10">{{obj.sha3Uncles}}</div>
-                              </div>
-                              <div class="row">
-                                <div class="col-md-2 objField" title="String - the 'extra data' field of this block.">extraData:</div><div class="col-md-10">{{obj.extraData}}</div>
-                              </div>
                             </div>
-
-                            <div class="col-md-4">
-                                <span class="objField" title="Array of uncle hashes">uncles:</span> <div class="bigText" style="height:50px;overflow-y:scroll">{{obj.uncles}}</div>
-                                <span class="objField" title="256 Bytes - the bloom filter for the logs of the block. null when its pending block.">logsBloom:</span> <div class="bigText" style="height:50px;overflow-y:scroll">{{obj.logsBloom}}</div>
+                            <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - the root of the transaction trie of the block.">transactionsRoot:</div><div class="col-md-9">{{obj.transactionsRoot}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - the root of the final state trie of the block.">stateRoot:</div><div class="col-md-10">{{obj.stateRoot}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 objField" title="32 Bytes - SHA3 of the uncles data in the block.">sha3Uncles:</div><div class="col-md-10">{{obj.sha3Uncles}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-2 objField" title="String - the 'extra data' field of this block.">extraData:</div><div class="col-md-10">{{obj.extraData}}</div>
                             </div>
                         </div>
-                        <table class="table">
-                              <thead>
-                                  <tr>
-                                      <th>N</th><th>Hash</th><th>From</th><th>Nonce</th><th>To</th><th>Value</th><th>Gas price</th><th title="Number - gas provided by the sender.">Gas</th><th>Input</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr ng-repeat="tx in obj.transactions">
-                                      <td>{{tx.transactionIndex}}</td>
-                                      <td><a ng-click="openTxTab(tx.hash)" class="specA">{{tx.hash}}</a></td>
-                                      <td>
-                                        <a ng-click="openAddressTab(tx.from)" class="specA">{{tx.from}}</a>
-                                      </td>
-                                      <td>{{tx.nonce}}</td>
-                                      <td>
-                                        <span class="label label-success" ng-show="	tx.toContr=='M'" title="Contract mined !">M</span>
-                                        <span class="label label-danger" ng-show="tx.toContr=='E'" title="Contract not created">E</span>
-                                        <span class="label label-primary" ng-show="tx.toContr=='C'" title="Contract">C</span>
-                                        <a ng-click="openAddressTab(tx.to)" class="specA">{{tx.to}}</a>
-                                      </td>
-                                      <td>{{tx.value | units : settings.unit}}</td>
-                                      <td>{{tx.gasPrice | units : settings.unit}}</td>
-                                      <td>{{tx.gas}}</td>
-                                      <td>{{tx.input.substring(0,10)}}</td>
-                                  </tr>
-                              </tbody>
-                            </table>
-                      </div>
 
-                        <div ng-show="tabName.startsWith('tx')">
-                          <div class="row">
-                            <div class="col-md-5">
-                          <div class="row">
-                              <div class="col-md-3 objField" title="String, 32 Bytes - hash of the transaction.">hash:</div>
-                              <div class="col-md-9">{{obj.hash}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="Number - block number where this transaction was in. null when its pending.">blockNumber:</div>
-                              <div class="col-md-9"><a ng-click="openBlockTab(obj.blockNumber)" class="specA">{{obj.blockNumber}}</a> ({{ui.blockArr[0].number - obj.blockNumber}} block confirmations)</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="String, 32 Bytes - hash of the block where this transaction was in. null when its pending.">blockHash:</div>
-                              <div class="col-md-9">{{obj.blockHash}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="Number - integer of the transactions index position in the block. null when its pending.">transactionIndex:</div>
-                              <div class="col-md-9">{{obj.transactionIndex}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="String, 20 Bytes - address of the sender.">from:</div>
-                              <div class="col-md-9"><a ng-click="openAddressTab(obj.from)" class="specA">{{obj.from}}</a></div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="Number - the number of transactions made by the sender prior to this one.">nonce:</div>
-                              <div class="col-md-9">{{obj.nonce}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="String, 20 Bytes - address of the receiver. null when its a contract creation transaction.">to:</div>
-                              <div class="col-md-9"><a ng-click="openAddressTab(obj.to)" class="specA">{{obj.to}}</a></div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="BigNumber - value.">value:</div>
-                              <div class="col-md-9">{{obj.value  | units : settings.unit}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="Transaction network fee (gas * gasPrice)">fee:</div>
-                              <div class="col-md-9">{{obj.gas * obj.gasPrice | unitsSimpleNumber : settings.unit}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="String - 20 Bytes - The contract address created, if the transaction was a contract creation, otherwise null.">contractAddress:</div>
-                              <div class="col-md-9 objField2"><a class="specA2" ng-click="openAddressTab(obj.contractAddress)">{{obj.contractAddress}}</a></div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="BigNumber - gas price provided by the sender in Wei.">gasPrice:</div>
-                              <div class="col-md-9">{{obj.gasPrice  | units : settings.unit}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="Number - gas provided by the sender">gas:</div>
-                              <div class="col-md-9">{{obj.gas}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="The amount of gas used by this specific transaction alone.">gasUsed:</div><div class="col-md-9">{{obj.gasUsed}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="Number - The total amount of gas used when this transaction was executed in the block.">cumulativeGasUsed:</div><div class="col-md-9">{{obj.cumulativeGasUsed}}</div>
-                          </div>
-                          <div class="row">
-                              <div class="col-md-3 objField" title="Array of log objects, which this transaction generated.">logs:</div>
-                              <div class="col-md-9 bigText">
-                                {{obj.logs}}
-                              </div>
-                          </div>
+                        <div class="col-md-4">
+                            <span class="objField" title="Array of uncle hashes">uncles:</span> <div class="bigText" style="height:50px;overflow-y:scroll">{{obj.uncles}}</div>
+                            <span class="objField" title="256 Bytes - the bloom filter for the logs of the block. null when its pending block.">logsBloom:</span> <div class="bigText" style="height:50px;overflow-y:scroll">{{obj.logsBloom}}</div>
+                        </div>
+                    </div>
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>N</th><th>Hash</th><th>From</th><th>Nonce</th><th>To</th><th>Value</th><th>Gas price</th><th title="Number - gas provided by the sender.">Gas</th><th>Input</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr ng-repeat="tx in obj.transactions">
+                            <td>{{tx.transactionIndex}}</td>
+                            <td><a ng-click="openTxTab(tx.hash)" class="specA">{{tx.hash}}</a></td>
+                            <td>
+                                <a ng-click="openAddressTab(tx.from)" class="specA">{{tx.from}}</a>
+                            </td>
+                            <td>{{tx.nonce}}</td>
+                            <td>
+                                <span class="label label-success" ng-show="	tx.toContr=='M'" title="Contract mined !">M</span>
+                                <span class="label label-danger" ng-show="tx.toContr=='E'" title="Contract not created">E</span>
+                                <span class="label label-primary" ng-show="tx.toContr=='C'" title="Contract">C</span>
+                                <a ng-click="openAddressTab(tx.to)" class="specA">{{tx.to}}</a>
+                            </td>
+                            <td>{{tx.value | units : settings.unit}}</td>
+                            <td>{{tx.gasPrice | units : settings.unit}}</td>
+                            <td>{{tx.gas}}</td>
+                            <td>{{tx.input.substring(0,10)}}</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div ng-show="tabName.startsWith('tx')">
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String, 32 Bytes - hash of the transaction.">hash:</div>
+                                <div class="col-md-9">{{obj.hash}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - block number where this transaction was in. null when its pending.">blockNumber:</div>
+                                <div class="col-md-9"><a ng-click="openBlockTab(obj.blockNumber)" class="specA">{{obj.blockNumber}}</a> ({{ui.blockArr[0].number - obj.blockNumber}} block confirmations)</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String, 32 Bytes - hash of the block where this transaction was in. null when its pending.">blockHash:</div>
+                                <div class="col-md-9">{{obj.blockHash}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - integer of the transactions index position in the block. null when its pending.">transactionIndex:</div>
+                                <div class="col-md-9">{{obj.transactionIndex}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String, 20 Bytes - address of the sender.">from:</div>
+                                <div class="col-md-9"><a ng-click="openAddressTab(obj.from)" class="specA">{{obj.from}}</a></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - the number of transactions made by the sender prior to this one.">nonce:</div>
+                                <div class="col-md-9">{{obj.nonce}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String, 20 Bytes - address of the receiver. null when its a contract creation transaction.">to:</div>
+                                <div class="col-md-9"><a ng-click="openAddressTab(obj.to)" class="specA">{{obj.to}}</a></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="BigNumber - value.">value:</div>
+                                <div class="col-md-9">{{obj.value  | units : settings.unit}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Transaction network fee (gas * gasPrice)">fee:</div>
+                                <div class="col-md-9">{{obj.gas * obj.gasPrice | unitsSimpleNumber : settings.unit}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="String - 20 Bytes - The contract address created, if the transaction was a contract creation, otherwise null.">contractAddress:</div>
+                                <div class="col-md-9 objField2"><a class="specA2" ng-click="openAddressTab(obj.contractAddress)">{{obj.contractAddress}}</a></div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="BigNumber - gas price provided by the sender in Wei.">gasPrice:</div>
+                                <div class="col-md-9">{{obj.gasPrice  | units : settings.unit}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - gas provided by the sender">gas:</div>
+                                <div class="col-md-9">{{obj.gas}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="The amount of gas used by this specific transaction alone.">gasUsed:</div><div class="col-md-9">{{obj.gasUsed}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Number - The total amount of gas used when this transaction was executed in the block.">cumulativeGasUsed:</div><div class="col-md-9">{{obj.cumulativeGasUsed}}</div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-3 objField" title="Array of log objects, which this transaction generated.">logs:</div>
+                                <div class="col-md-9 bigText">
+                                    {{obj.logs}}
+                                </div>
+                            </div>
                         </div>
 
                         <div class="col-md-7">
-                          <div class="row">
-                            <span class="objField">input:</span> <span class="bigText" title="String - the data sent along with the transaction.">{{obj.input}}</span>
-                          </div>
+                            <div class="row">
+                                <span class="objField">input:</span> <span class="bigText" title="String - the data sent along with the transaction.">{{obj.input}}</span>
+                            </div>
                         </div>
 
-                      </div>
                     </div>
+                </div>
 
-                    <div ng-show="tabName.startsWith('addr')">
-                      <div class="row">
+                <div ng-show="tabName.startsWith('addr')">
+                    <div class="row">
                         <div class="col-md-3">
                             <div class="row">
                                 <div class="col-md-2 objField" title="String - 20 Bytes - Address">address:</div>
@@ -282,9 +282,9 @@
                                 <div class="col-md-2 objField" title="Is contract ?">contract:</div>
                                 <div class="col-md-10" ng-show="obj.code == '0x'">No</div>
                                 <div class="col-md-10" ng-show="obj.code != '0x'">
-                                  Yes.
-                                  <span class="objField2" ng-show="obj.contractDetails == null">Contract not registered in governance</span>
-                                  <span class="objField2" ng-show="obj.contractDetails != null">
+                                    Yes.
+                                    <span class="objField2" ng-show="obj.contractDetails == null">Contract not registered in governance</span>
+                                    <span class="objField2" ng-show="obj.contractDetails != null">
                                       {{obj.contractDetails.contractName}}/{{obj.contractDetails.contractVersion}}
                                   </span>
                                 </div>
@@ -301,148 +301,148 @@
                                 <div class="col-md-2 objField" title="String - the code at a specific address.">code:</div>
                                 <div class="col-md-10 bigText">{{obj.code}}</div>
                             </div>
-                      </div>
-                      <div class="col-md-9">
-                        <table class="table" ng-hide="obj.code == '0x'">
-                              <thead>
-                                  <tr>
-                                      <th>Block</th><th>Tx hash</th><th>Event</th><th>Args</th>
-                                  </tr>
-                              </thead>
-                              <tbody>
-                                  <tr ng-repeat="event in obj.eventArr">
+                        </div>
+                        <div class="col-md-9">
+                            <table class="table" ng-hide="obj.code == '0x'">
+                                <thead>
+                                <tr>
+                                    <th>Block</th><th>Tx hash</th><th>Event</th><th>Args</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="event in obj.eventArr">
                                     <td><a ng-click="openBlockTab(event.blockNumber)" class="specA">{{event.blockNumber}}</a></td>
                                     <td><a ng-click="openTxTab(event.transactionHash)" class="specA">{{event.transactionHash}}</a></td>
                                     <td>{{event.event}}</td>
                                     <td>{{event.args}}</td>
-                                  </tr>
-                              </tbody>
-                          </table>
-                      </div>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
 
                 <div ng-show="tabName.startsWith('contracts')">
                     <div class="row">
-                          <div class="col-md-3" style="margin-top:12px">
-                                  <form name="addContractForm" ng-submit="addContract(addContractForm)" novalidate>
-                                    <div class="form-group" ng-class="{'has-error' : addContractForm.contractAddress.$invalid && !addContractForm.contractAddress.$pristine}">
-                                        <label>Contract address</label>
-                                        <input type="text" ng-maxlength="42"  maxlength="42" ng-minlength="42" class="form-control input-sm" placeholder="Contract address" name="contractAddress" ng-model="contractDetails.contractAddress"  required>
-                                        <p ng-show="addContractForm.contractAddress.$error.minlength" class="help-block">Contract address is too short</p>
-                                    </div>
-                                    <div class="form-group" ng-class="{'has-error' : addContractForm.contractName.$invalid && !addContractForm.contractName.$pristine}">
-                                        <label>Contract name</label>
-                                        <input type="text" ng-maxlength="30"  maxlength="30" ng-minlength="2" class="form-control input-sm" placeholder="Contract name" name="contractName" ng-model="contractDetails.contractName"  required>
-                                        <p ng-show="addContractForm.contractName.$error.minlength" class="help-block">Contract name is too short</p>
-                                    </div>
-                                    <div class="form-group" ng-class="{'has-error' : addContractForm.contractVersion.$invalid && !addContractForm.contractVersion.$pristine}">
-                                        <label>Contract version</label>
-                                        <input type="text" ng-maxlength="20" maxlength="20" ng-minlength="2" class="form-control input-sm" placeholder="Contract version" name="contractVersion"
-                                                  ng-model="contractDetails.contractVersion"  required>
-                                        <p ng-show="addContractForm.contractVersion.$error.minlength" class="help-block">Contract version</p>
-                                    </div>
-                                    <div>
-                                        <label>Contract ABI</label>
-                                        <textarea  style="height:300px" class="form-control input-sm" placeholder="Contract ABI" name="contractABI" ng-model="contractDetails.contractABI"></textarea>
-                                    </div>
-                                    <div class="pull-right" style="margin-top:10px">
-                                      <button type="submit" class="btn btn-info btn-sm" ng-disabled="addContractForm.$invalid">Add contract</button>
-                                    </div>
-                                  </form>
-                          </div>
-                          <div class="col-md-9">
+                        <div class="col-md-3" style="margin-top:12px">
+                            <form name="addContractForm" ng-submit="addContract(addContractForm)" novalidate>
+                                <div class="form-group" ng-class="{'has-error' : addContractForm.contractAddress.$invalid && !addContractForm.contractAddress.$pristine}">
+                                    <label>Contract address</label>
+                                    <input type="text" ng-maxlength="42"  maxlength="42" ng-minlength="42" class="form-control input-sm" placeholder="Contract address" name="contractAddress" ng-model="contractDetails.contractAddress"  required>
+                                    <p ng-show="addContractForm.contractAddress.$error.minlength" class="help-block">Contract address is too short</p>
+                                </div>
+                                <div class="form-group" ng-class="{'has-error' : addContractForm.contractName.$invalid && !addContractForm.contractName.$pristine}">
+                                    <label>Contract name</label>
+                                    <input type="text" ng-maxlength="30"  maxlength="30" ng-minlength="2" class="form-control input-sm" placeholder="Contract name" name="contractName" ng-model="contractDetails.contractName"  required>
+                                    <p ng-show="addContractForm.contractName.$error.minlength" class="help-block">Contract name is too short</p>
+                                </div>
+                                <div class="form-group" ng-class="{'has-error' : addContractForm.contractVersion.$invalid && !addContractForm.contractVersion.$pristine}">
+                                    <label>Contract version</label>
+                                    <input type="text" ng-maxlength="20" maxlength="20" ng-minlength="2" class="form-control input-sm" placeholder="Contract version" name="contractVersion"
+                                           ng-model="contractDetails.contractVersion"  required>
+                                    <p ng-show="addContractForm.contractVersion.$error.minlength" class="help-block">Contract version</p>
+                                </div>
+                                <div>
+                                    <label>Contract ABI</label>
+                                    <textarea  style="height:300px" class="form-control input-sm" placeholder="Contract ABI" name="contractABI" ng-model="contractDetails.contractABI"></textarea>
+                                </div>
+                                <div class="pull-right" style="margin-top:10px">
+                                    <button type="submit" class="btn btn-info btn-sm" ng-disabled="addContractForm.$invalid">Add contract</button>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="col-md-9">
                             <table class="table">
-                                  <thead>
-                                      <tr>
-                                          <th width="25%">Address</th><th width="20%">Name</th><th width="10%">Version</th><th width="40%">ABI</th><th width="5%">Edit</th>
-                                      </tr>
-                                  </thead>
-                                  <tbody>
-                                      <tr ng-repeat="contract in obj">
-                                        <td><a ng-click="openAddressTab(contract.contractAddress)" class="specA">{{contract.contractAddress}}</a></td>
-                                        <td>{{contract.contractName}}</td>
-                                        <td>{{contract.contractVersion}}</td>
-                                        <td><input type="text" class="inputTdCell" readonly="true" value="{{contract.contractABI}}"/></td>
-                                        <td>
-                                          <span class="glyphicon glyphicon-pencil" title="Edit" style="cursor:pointer;font-size:14px" aria-hidden="true" ng-click="editContract(contract.contractAddress)"></span>
-                                          <span class="glyphicon glyphicon-remove" title="Delete" style="cursor:pointer;font-size:14px;margin-left:10px" aria-hidden="true" ng-click="deleteContract(contract.contractAddress)"></span>
-                                        </td>
-                                      </tr>
-                                  </tbody>
-                                </table>
-                          </div>
+                                <thead>
+                                <tr>
+                                    <th width="25%">Address</th><th width="20%">Name</th><th width="10%">Version</th><th width="40%">ABI</th><th width="5%">Edit</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                <tr ng-repeat="contract in obj">
+                                    <td><a ng-click="openAddressTab(contract.contractAddress)" class="specA">{{contract.contractAddress}}</a></td>
+                                    <td>{{contract.contractName}}</td>
+                                    <td>{{contract.contractVersion}}</td>
+                                    <td><input type="text" class="inputTdCell" readonly="true" value="{{contract.contractABI}}"/></td>
+                                    <td>
+                                        <span class="glyphicon glyphicon-pencil" title="Edit" style="cursor:pointer;font-size:14px" aria-hidden="true" ng-click="editContract(contract.contractAddress)"></span>
+                                        <span class="glyphicon glyphicon-remove" title="Delete" style="cursor:pointer;font-size:14px;margin-left:10px" aria-hidden="true" ng-click="deleteContract(contract.contractAddress)"></span>
+                                    </td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
 
                 </div>
 
-          </div>
+            </div>
         </div>
 
 
-      </div>
     </div>
-    <!--
-      Settings modal
-    -->
-    <div id="settingsModal" class="modal fade" role="dialog">
-      <div class="modal-dialog modalSettings">
+</div>
+<!--
+  Settings modal
+-->
+<div id="settingsModal" class="modal fade" role="dialog">
+    <div class="modal-dialog modalSettings">
         <div class="modal-content">
-          <form name="chageActisSettingsForm" ng-submit="connectToPeer(chageActisSettingsForm)" novalidate>
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal">&times;</button>
-              <h4 class="modal-title">Actis configuration</h4>
-            </div>
-            <div class="modal-body">
-              <div>
-                  <input type="button" value="New peer" class="btn btn-default btn-sm" ng-click="addPeer()"/>
-              </div>
-              <div class="row">
-                  <div class="col-md-5">
-                      <div style="font-weight:bold;margin-top:20px">Peers:</div>
-                      <ul>
-                      <li ng-repeat="(peerName,peer) in appConfig.peers">
-                        <a ng-click="switchPeer(peerName)" class="specA" title="{{peer.peerUri}}">{{peerName}}</a>
-                      </li>
-                    </ul>
-                  </div>
-                  <div class="col-md-7">
-                    <div class="err">{{settingsErr}}</div>
-                    <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerName.$invalid && !chageActisSettingsForm.peerName.$pristine}">
-                        <label>Peer name</label>
-                        <input type="text" ng-maxlength="30" maxlength="30"  ng-minlength="2" class="form-control input-sm" placeholder="Connection name" name="peerName" ng-model="peer.peerName"  required>
-                        <p ng-show="chageActisSettingsForm.peerName.$error.minlength" class="help-block">Peer name is too short.</p>
+            <form name="chageActisSettingsForm" ng-submit="connectToPeer(chageActisSettingsForm)" novalidate>
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Actis configuration</h4>
+                </div>
+                <div class="modal-body">
+                    <div>
+                        <input type="button" value="New peer" class="btn btn-default btn-sm" ng-click="addPeer()"/>
                     </div>
-                    <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerUri.$invalid && !chageActisSettingsForm.peerUri.$pristine}">
-                        <label>RPC node address</label>
-                        <input type="text" ng-maxlength="50" maxlength="50" ng-minlength="8" class="form-control input-sm" placeholder="Enter peer address. Example: http://127.0.0.1:8545" name="peerUri"
-                                  ng-model="peer.peerUri"  required>
-                        <p ng-show="chageActisSettingsForm.peerUri.$error.minlength" class="help-block">Peer address is too short.</p>
-                    </div>
-                    <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.blockCount.$invalid && !chageActisSettingsForm.blockCount.$pristine}">
-                        <label>Show blocks count</label>
-                        <input type="text" onkeypress="return isNumberKey(event, this)" maxlength="3" ng-maxlength="3" ng-minlength="1" class="form-control input-sm" placeholder="Block count"
-                                  name="blockCount" ng-model="peer.blockCount"  required>
-                        <p ng-show="chageActisSettingsForm.blockCount.$error.minlength" class="help-block">Invalid block count</p>
-                    </div>
-                    <div class="pull-right">
-                      <button type="button" class="btn btn-info btn-sm" ng-show="appConfig.peers[settings.peer.peerName]!=null" ng-disabled="chageActisSettingsForm.$invalid" ng-click="deletePeer(peer.peerName)">Delete</button>
-                      <button type="button" class="btn btn-info btn-sm" ng-disabled="chageActisSettingsForm.$invalid"  ng-click="savePeer()">Save</button>
-                      <button type="submit" class="btn btn-info btn-sm" ng-disabled="chageActisSettingsForm.$invalid">Connect</button>
-                    </div>
-                  </div>
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div style="font-weight:bold;margin-top:20px">Peers:</div>
+                            <ul>
+                                <li ng-repeat="(peerName,peer) in appConfig.peers">
+                                    <a ng-click="switchPeer(peerName)" class="specA" title="{{peer.peerUri}}">{{peerName}}</a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-7">
+                            <div class="err">{{settingsErr}}</div>
+                            <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerName.$invalid && !chageActisSettingsForm.peerName.$pristine}">
+                                <label>Peer name</label>
+                                <input type="text" ng-maxlength="30" maxlength="30"  ng-minlength="2" class="form-control input-sm" placeholder="Connection name" name="peerName" ng-model="peer.peerName"  required>
+                                <p ng-show="chageActisSettingsForm.peerName.$error.minlength" class="help-block">Peer name is too short.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.peerUri.$invalid && !chageActisSettingsForm.peerUri.$pristine}">
+                                <label>RPC node address</label>
+                                <input type="text" ng-maxlength="50" maxlength="50" ng-minlength="8" class="form-control input-sm" placeholder="Enter peer address. Example: http://127.0.0.1:8545" name="peerUri"
+                                       ng-model="peer.peerUri"  required>
+                                <p ng-show="chageActisSettingsForm.peerUri.$error.minlength" class="help-block">Peer address is too short.</p>
+                            </div>
+                            <div class="form-group" ng-class="{'has-error' : chageActisSettingsForm.blockCount.$invalid && !chageActisSettingsForm.blockCount.$pristine}">
+                                <label>Show blocks count</label>
+                                <input type="text" onkeypress="return isNumberKey(event, this)" maxlength="3" ng-maxlength="3" ng-minlength="1" class="form-control input-sm" placeholder="Block count"
+                                       name="blockCount" ng-model="peer.blockCount"  required>
+                                <p ng-show="chageActisSettingsForm.blockCount.$error.minlength" class="help-block">Invalid block count</p>
+                            </div>
+                            <div class="pull-right">
+                                <button type="button" class="btn btn-info btn-sm" ng-show="appConfig.peers[settings.peer.peerName]!=null" ng-disabled="chageActisSettingsForm.$invalid" ng-click="deletePeer(peer.peerName)">Delete</button>
+                                <button type="button" class="btn btn-info btn-sm" ng-disabled="chageActisSettingsForm.$invalid"  ng-click="savePeer()">Save</button>
+                                <button type="submit" class="btn btn-info btn-sm" ng-disabled="chageActisSettingsForm.$invalid">Connect</button>
+                            </div>
+                        </div>
 
-            </div>
+                    </div>
 
-          </form>
+            </form>
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-default btn-sm" data-dismiss="modal">Close</button>
         </div>
-      </div>
     </div>
+</div>
 
 
-  </body>
+</body>
 </html>

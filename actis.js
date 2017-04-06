@@ -359,7 +359,7 @@ app.controller('mainController', ['$scope', '$rootScope', '$timeout','$interval'
 
             var events = contractInstance.allEvents({fromBlock: 0, toBlock: 'latest'});
             events.watch(function(error, result){
-                addrObj.eventArr.unshift(result);
+            	addrObj.eventArr.unshift(result);
             });
         }
 		 }
