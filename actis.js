@@ -61,7 +61,7 @@ app.run(function ($rootScope, uiService, localStorageService) {
     //selected peer
     peerName:null,
     web3 : null,
-    reloadInterval: 1000,
+    reloadInterval: 2000,
 		//current value unit
 		unit:"wei",
 		units:["wei", "kwei", "mwei", "gwei","szabo", "finney","ether","kether","mether","gether","tether"]
@@ -79,10 +79,11 @@ app.run(function ($rootScope, uiService, localStorageService) {
 	 gasPrice : 0,
 	 //whether the node is mining or not.
 	 mining : false,
-	 //pending block
-	 pendingBlock: null,
 	 //show progress bar
-	 showProgress : false
+	 showProgress : false,
+        //last block
+     lastBlockNumber : 0
+
  }
 
  uiService.initUI();
@@ -101,55 +102,54 @@ app.service('uiService', function ($rootScope, $http, $timeout, $interval) {
 			var web3 = $rootScope.settings.web3;
 
 			if (web3 != null){
-				web3.eth.getBlock("latest", function(error, block){
-					if(error){
-							alert(error);
-					}else{
-						if (blockArr.length == 0){
-							blockArr.push(block);
-						}else{
-							//add only latest block
-							if (blockArr[0].number != block.number){
-								blockArr.unshift(block);
-								if (blockArr.length > $rootScope.settings.peer.blockCount){
-									blockArr.pop();
-								}
-							}
-						}
-				 }
-				});
+                var lastBlock = web3.eth.blockNumber;
 
-				web3.eth.getBlock("pending", function(error, block){
-					if(error){
-							alert(error);
-					}else{
-							$rootScope.ui.pendingBlock = block;
-				 }
-				});
+                if (lastBlock > $rootScope.ui.lastBlockNumber) {
+                    web3.eth.getBlock("latest", function(error, block){
+                        if(error){
+                            alert(error);
+                        }else{
+                            if (blockArr.length == 0){
+                                blockArr.push(block);
+                            }else{
+                                //add only latest block
+                                if (blockArr[0].number != block.number){
+                                    blockArr.unshift(block);
+                                    if (blockArr.length > $rootScope.settings.peer.blockCount){
+                                        blockArr.pop();
+                                    }
+                                }
+                            }
+                        }
+                    });
 
-				web3.eth.getHashrate(function(error, result){
-					if(error){
-						alert(error);
-					}else{
-						$rootScope.ui.hashRate = result;
-					}
-				});
+                    web3.eth.getHashrate(function(error, result){
+                        if(error){
+                            alert(error);
+                        }else{
+                            $rootScope.ui.hashRate = result;
+                        }
+                    });
 
-				web3.eth.getGasPrice(function(error, result){
-					if(error){
-						alert(error);
-					}else{
-							$rootScope.ui.gasPrice = result;
-					}
-				});
+                    web3.eth.getGasPrice(function(error, result){
+                        if(error){
+                            alert(error);
+                        }else{
+                            $rootScope.ui.gasPrice = result;
+                        }
+                    });
 
-				web3.eth.getMining(function(error, result){
-					if(error){
-						alert(error);
-					}else{
-						$rootScope.ui.mining = result;
-					}
-				});
+                    web3.eth.getMining(function(error, result){
+                        if(error){
+                            alert(error);
+                        }else{
+                            $rootScope.ui.mining = result;
+                        }
+                    });
+
+                    $rootScope.ui.lastBlockNumber = lastBlock;
+                }
+
 			}
   	}
 });
