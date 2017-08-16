@@ -115,7 +115,7 @@ app.service('uiService', function ($rootScope, $http, $timeout, $interval) {
                                 //add only latest block
                                 if (blockArr[0].number != block.number){
                                     blockArr.unshift(block);
-                                    if (blockArr.length > $rootScope.settings.peer.blockCount){
+                                    if (blockArr.length > $rootScope.appConfig.peers[$rootScope.settings.peerName].blockCount) {
                                         blockArr.pop();
                                     }
                                 }
