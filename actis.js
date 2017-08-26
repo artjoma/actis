@@ -102,54 +102,53 @@ app.service('uiService', function ($rootScope, $http, $timeout, $interval) {
 			var web3 = $rootScope.settings.web3;
 
 			if (web3 != null){
-                var lastBlock = web3.eth.blockNumber;
-
-                if (lastBlock > $rootScope.ui.lastBlockNumber) {
-                    web3.eth.getBlock("latest", function(error, block){
-                        if(error){
-                            alert(error);
-                        }else{
-                            if (blockArr.length == 0){
-                                blockArr.push(block);
-                            }else{
-                                //add only latest block
-                                if (blockArr[0].number != block.number){
-                                    blockArr.unshift(block);
-                                    if (blockArr.length > $rootScope.appConfig.peers[$rootScope.settings.peerName].blockCount) {
-                                        blockArr.pop();
+				web3.eth.getBlockNumber(function(err, lastBlock){
+                    if (lastBlock > $rootScope.ui.lastBlockNumber) {
+                        web3.eth.getBlock("latest", function (error, block) {
+                            if (error) {
+                                alert(error);
+                            } else {
+                                if (blockArr.length == 0) {
+                                    blockArr.push(block);
+                                } else {
+                                    //add only latest block
+                                    if (blockArr[0].number != block.number) {
+                                        blockArr.unshift(block);
+                                        if (blockArr.length > $rootScope.appConfig.peers[$rootScope.settings.peerName].blockCount) {
+                                            blockArr.pop();
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
 
-                    web3.eth.getHashrate(function(error, result){
-                        if(error){
-                            alert(error);
-                        }else{
-                            $rootScope.ui.hashRate = result;
-                        }
-                    });
+                        web3.eth.getHashrate(function(error, result){
+                            if(error){
+                                alert(error);
+                            }else{
+                                $rootScope.ui.hashRate = result;
+                            }
+                        });
 
-                    web3.eth.getGasPrice(function(error, result){
-                        if(error){
-                            alert(error);
-                        }else{
-                            $rootScope.ui.gasPrice = result;
-                        }
-                    });
+                        web3.eth.getGasPrice(function(error, result){
+                            if(error){
+                                alert(error);
+                            }else{
+                                $rootScope.ui.gasPrice = result;
+                            }
+                        });
 
-                    web3.eth.getMining(function(error, result){
-                        if(error){
-                            alert(error);
-                        }else{
-                            $rootScope.ui.mining = result;
-                        }
-                    });
+                        web3.eth.getMining(function(error, result){
+                            if(error){
+                                alert(error);
+                            }else{
+                                $rootScope.ui.mining = result;
+                            }
+                        });
 
-                    $rootScope.ui.lastBlockNumber = lastBlock;
-                }
-
+                        $rootScope.ui.lastBlockNumber = lastBlock;
+                    }
+                });
 			}
   	}
 });
