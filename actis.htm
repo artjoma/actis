@@ -75,10 +75,10 @@
     </div>
 </nav>
 
-<div style="margin-top:5px;margin-left:10px" ng-hide="settings.web3==null">
+<div style="margin-top:5px;margin-left:2px" ng-hide="settings.web3==null">
     <div class="list-group list-group-horizontal">
-        <div class="list-group-item" ng-repeat="block in ui.blockArr" style="width:170px">
-            <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab(block.number)" style="cursor: pointer;">{{block.number}}</a></h4>
+        <div class="list-group-item" ng-repeat="block in ui.blockArr" style="width:165px">
+            <h4 class="list-group-item-heading">block: <a ng-click="openBlockTab(block.number)" style="cursor: pointer;font-size: 16px;">{{block.number}}</a></h4>
             <p class="list-group-item-text">time: {{block.timestamp | utc | date:'HH:mm:ss'}} tx: <span ng-class="{objField : block.transactions.length > 0}">{{block.transactions.length}}</span></p>
         </div>
     </div>
@@ -102,7 +102,7 @@
           Tab panes
         -->
         <div class="tab-content">
-            <div  ng-repeat="(tabName, obj) in userTabs"  ng-show="tabSelected == tabName">
+            <div  ng-repeat="(tabName, obj) in userTabs" ng-show="tabSelected == tabName">
 
                 <div ng-show="tabName.startsWith('block')">
                     <div class="row">
