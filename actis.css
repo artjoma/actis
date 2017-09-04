@@ -1,81 +1,99 @@
 body {
-  padding-top: 50px;
+    padding-top: 50px;
 }
-.err{
-  color: #D45C7B;
+
+.err {
+    color: #D45C7B;
 }
-.topPanel li div:nth-child(odd){
-  color: #337ab7;
-  padding-top:5px;
+
+.topPanel li div:nth-child(odd) {
+    color: #337ab7;
+    padding-top: 5px;
 }
-.topPanel li div:nth-child(even){
-  color: #777;
+
+.topPanel li div:nth-child(even) {
+    color: #777;
 }
+
 .topPanel li {
-  margin-right:10px;
-  width:120px;
+    margin-right: 10px;
+    width: 120px;
 }
+
 /* TABS */
 .closeTab {
     padding: 2px;
 }
 
-.objField{
-  color:  #337ab7;
+.objField {
+    color: #337ab7;
 }
-.objField2{
-  color: #429B42;
+
+.objField2 {
+    color: #429B42;
 }
-.objField3{
-  color: #d9534f;
+
+.objField3 {
+    color: #d9534f;
 }
-.objField4{
- color: #D39641;
- font-weight: bold;
+
+.objField4 {
+    color: #D39641;
+    font-weight: bold;
 }
+
 .list-group-horizontal .list-group-item {
     display: inline-block !important;
 }
+
 th {
-  font-size: 13px;
-}
-td {
-  font-size: 12px;
+    font-size: 13px;
 }
 
-.controlSelect{
-	height: 20px !important;
-	padding: 0px 0px !important;
-  font-size: 12px;
-  width:70%;
+td {
+    font-size: 12px;
 }
-.specA{
-  color:#3C3C3C;
-  cursor:pointer;
+
+.controlSelect {
+    height: 20px !important;
+    padding: 0px 0px !important;
+    font-size: 12px;
+    width: 70%;
 }
-.specA2{
-  color: #429B42;
-  cursor:pointer;
+
+.specA {
+    color: #3C3C3C;
+    cursor: pointer;
 }
-.bigText{
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-   white-space: normal;
-   color:#777;
-   font-size:12px;
+
+.specA2 {
+    color: #429B42;
+    cursor: pointer;
 }
-.progressBarShow{
-   visibility: visible;
+
+.bigText {
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    white-space: normal;
+    color: #777;
+    font-size: 12px;
 }
-.progressBarHide{
-   visibility: hidden;
+
+.progressBarShow {
+    visibility: visible;
 }
-.modalSettings{
-   width: 720px;
+
+.progressBarHide {
+    visibility: hidden;
 }
-.inputTdCell{
-  padding:0px 0px;
-  border: 0px;
-  height:14px;
-  width:100%;
+
+.modalSettings {
+    width: 720px;
+}
+
+.inputTdCell {
+    padding: 0px 0px;
+    border: 0px;
+    height: 14px;
+    width: 100%;
 }

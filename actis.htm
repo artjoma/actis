@@ -49,7 +49,7 @@
                 </li>
                 <li>
                     <div>Is mining</div>
-                    <div  ng-style="{'color': ui.mining ? '#D9534F':''}">{{ui.mining}}</div>
+                    <div ng-style="{'color': ui.mining ? '#D9534F':''}">{{ui.mining}}</div>
                 </li>
                 <li ng-show="ui.mining">
                     <div>Peer hash rate(H/s)</div>
@@ -66,7 +66,6 @@
                 <li>
                     <span class="glyphicon glyphicon-file" ng-click="showContractsCovernance(null)" title="Contracts governance" style="font-size:22px;cursor:pointer;margin-top:12px;" aria-hidden="true"></span>
                 </li>
-
             </ul>
             <ul class="nav navbar-nav navbar-right" style="margin-top:12px;margin-right:1px">
                 <li><span class="glyphicon glyphicon-cog" title="Settings" style="font-size:26px;cursor:pointer" aria-hidden="true" data-toggle="modal" data-target="#settingsModal"></span></li>
@@ -84,20 +83,27 @@
     </div>
 
     <div class="container-fluid" ng-hide="settings.web3==null">
-        <div class="row" >
+        <div class="row">
             <div class="col-md-4" style="padding-right:0px">
-                <input type="text"  class="form-control" placeholder="Block, transaction, address | Press Enter to search"  maxlength="100"  ng-model="searchString"  ng-keyup="$event.keyCode == 13 && searchComponent()"/>
+                <input type="text"  class="form-control" placeholder="Block, transaction, address | Press Enter to search" maxlength="100" ng-model="searchString" ng-keyup="$event.keyCode == 13 && searchComponent()"/>
             </div>
             <div class="col-md-8" style="padding-left:0px">
-                <img src="img/loader.gif"  style="height:36px" ng-style="{'visibility': ui.showProgress ? 'visible':'hidden'}" /> Last search: {{infoSearch}}
+                <img src="img/loader.gif"  style="height:36px" ng-style="{'visibility': ui.showProgress ? 'visible':'hidden'}"/> Last search: {{infoSearch}}
             </div>
         </div>
         <!-- Nav tabs -->
-        <ul id="tab-list" class="nav nav-tabs" role="tablist" style="margin-top:5px">
-            <li ng-repeat="(tabName, tabValue) in userTabs" ng-class="{'active' :  tabSelected==tabName}" style="cursor:pointer">
-                <a style="padding:6px 10px" ng-click="selectTab(tabName)">{{tabName.substring(0,15)}} <span class="glyphicon glyphicon-remove" aria-hidden="true"  ng-click="closeTab(tabName)"></span></a>
-            </li>
-        </ul>
+        <div class="row">
+            <div class="col-md-1" style="width:8px;" ng-show="getTabCount() > 0">
+                <span class="glyphicon glyphicon-remove" ng-click="closeAllTabs()" title="close all tabs" style="cursor:pointer; font-size:16px; margin-top:12px;" aria-hidden="true"></span>
+            </div>
+            <div class="col-md-11">
+                <ul id="tab-list" class="nav nav-tabs" role="tablist" style="margin-top:5px">
+                    <li ng-repeat="(tabName, tabValue) in userTabs" ng-class="{'active' : tabSelected==tabName}" style="cursor:pointer">
+                        <a style="padding:6px 10px" ng-click="selectTab(tabName)">{{tabName.substring(0,15)}} <span class="glyphicon glyphicon-remove" aria-hidden="true" ng-click="closeTab(tabName)"></span></a>
+                    </li>
+                </ul>
+            </div>
+        </div>
         <!--
           Tab panes
         -->
